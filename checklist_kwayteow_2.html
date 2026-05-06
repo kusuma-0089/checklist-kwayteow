@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>เช็คของร้านก๋วยเตี๋ยว</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E0DDD6;
+    --text: #1A1814;
+    --text2: #6B6860;
+    --text3: #A09D97;
+    --green: #1D9E75;
+    --green-bg: #E1F5EE;
+    --green-border: #9FE1CB;
+    --orange: #BA7517;
+    --orange-bg: #FAEEDA;
+    --orange-border: #FAC775;
+    --accent: #1A1814;
+    --radius: 10px;
+  }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .logo {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: #1A1814; display: flex; align-items: center;
+    justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 12px; color: var(--text2); }
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  select {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    color: var(--text);
+    outline: none;
+  }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .branch-note {
+    margin: 10px 16px 0;
+    background: var(--orange-bg);
+    border: 1px solid var(--orange-border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--orange);
+    display: none;
+    align-items: center;
+    gap: 6px;
+  }
+  .content { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .stat-num { font-size: 22px; font-weight: 600; }
+  .stat-label { font-size: 11px; color: var(--text3); margin-top: 1px; line-height: 1.3; }
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .sec-icon { font-size: 18px; }
+  .sec-title { font-size: 14px; font-weight: 600; flex: 1; }
+  .sec-count {
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2px 8px;
+    color: var(--text2);
+  }
+  .sec-arrow { font-size: 12px; color: var(--text3); transition: transform 0.2s; }
+  .sec-arrow.open { transform: rotate(180deg); }
+  .item-list { display: flex; flex-direction: column; }
+  .item-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    transition: background 0.1s;
+  }
+  .item-row:last-child { border-bottom: none; }
+  .item-row:active { background: var(--surface2); }
+  .item-name { flex: 1; font-size: 14px; color: var(--text); }
+  .item-name.done { color: var(--text3); }
+  .qty-group { display: flex; align-items: center; gap: 0; }
+  .qty-btn {
+    width: 30px; height: 30px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    border-radius: 6px;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--text);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .qty-btn:active { background: var(--border); }
+  .qty-input {
+    font-family: 'Sarabun', sans-serif;
+    width: 44px; height: 30px;
+    border: 1px solid var(--border);
+    border-left: none; border-right: none;
+    background: var(--surface);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+  }
+  .qty-input.has-value { color: var(--green); }
+  .qty-input.has-value-b2 { color: var(--orange); }
+  .clear-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+  .clear-btn:active { background: var(--surface2); }
+  .summary-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .summary-header {
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .summary-list { display: flex; flex-direction: column; }
+  .summary-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    gap: 12px;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-name { color: var(--text2); flex: 1; }
+  .summary-qty {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--green);
+    min-width: 60px;
+    text-align: right;
+  }
+  .summary-qty.b2 { color: var(--orange); }
+  .empty-note {
+    text-align: center;
+    color: var(--text3);
+    font-size: 13px;
+    padding: 20px;
+  }
+  .fab {
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 20px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    z-index: 100;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1A1814;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 200;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (max-width: 380px) {
+    .item-name { font-size: 13px; }
+    .qty-input { width: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">🍜</div>
+    <div>
+      <div class="header-title">เช็คของร้านก๋วยเตี๋ยว</div>
+      <div class="header-sub">บันทึกจำนวนวัตถุดิบรายวัน</div>
+    </div>
+  </div>
+  <div class="header-controls">
+    <select id="monthSel"></select>
+    <select id="yearSel"></select>
+    <select id="daySel"></select>
+  </div>
+</header>
+
+<div id="branchNote" class="branch-note">
+  📦 สาขาธรรมบูชา — รับของจากสาขาห้าแยก กรอกจำนวนที่รับมา
+</div>
+
+<div class="content">
+  <div style="margin-bottom: 2px;">
+    <div class="tabs">
+      <button class="tab active" onclick="switchBranch(1,this)">🏪 สาขาห้าแยก</button>
+      <button class="tab" onclick="switchBranch(2,this)">🏬 สาขาธรรมบูชา</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="statFilled">0</div>
+      <div class="stat-label">รายการที่<br>กรอกแล้ว</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">รายการ<br>ทั้งหมด</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statPct">0%</div>
+      <div class="stat-label">เปอร์เซ็นต์<br>เสร็จ</div>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+  <div id="summarySection"></div>
+</div>
+
+<button class="fab" onclick="copyForLine()">📋 คัดลอกส่งไลน์</button>
+<div class="toast" id="toast">คัดลอกแล้ว ✓</div>
+
+<script>
+const CATS = [
+  { id:'veg', icon:'🥬', label:'ผักและสมุนไพร',
+    items:['ถั่วงอก (5/10 กก.)','วุ้นเส้น','เส้นเล็ก','เส้นใหญ่','ใบเตย','ผักบุ้ง (ถุง)','ผักชี (กก.)','ผักชีใบเลื่อย (ถุง)','โหระพา (ถุง)','ใบกะเพรา','กระเทียมจีนปลอก','พริกแดงเขียว 2:1','กระเทียมไทย','ข่าแก่','พริกแดงผัดกะเพรา','แตงกวา','กล้วย','มัน','เผือก'] },
+  { id:'meat', icon:'🥩', label:'เนื้อสัตว์และโปรตีน',
+    items:['ลูกชิ้นหมู','ลูกชิ้นเนื้อ','หมูสับ (ถุงละ 100 กรัม)','หมูหมัก','ตับ','เนื้อสด','กระดูก','หมูตุ๋น (2kg)','เลือด (แกลลอน)','เนื้อตุ๋น (3kg)','เนื้อตุ๋น (ครึ่งกิโล)','เอ็นแก้ว (3kg)','ลิ้นวัว (ครึ่งกิโล)','สไบนาง','ไข่ไก่ (ฟอง)'] },
+  { id:'dry', icon:'🧂', label:'วัตถุดิบแห้งและเครื่องปรุง',
+    items:['หมี่ขาว','บะหมี่กึ่งสำเร็จรูป','หมี่เหลือง','ข้าวสาร','เฉาก๊วย','น้ำตาล','น้ำส้มสายชู','รสดี','คนอร์ก้อน','เด็กสมบูรณ์ซีอิ๊วดำ','พริกไทยป่น','ซอส','ซีอิ๊วขาว','น้ำจิ้มแจ่ว','เกลือ','ซอสหอยนางรม','ซีอิ๊วหาน','น้ำมันพืช','ผงชูรส','พริกป่น','น้ำปลาขวดเล็ก','อบเชย','เก๋ากี้แดง','ฮ่วยซัว','โป๊ยก๊ักดอก','เม็ดผักชี/เม็ดพริกไทย','หลอด','แก้ว','ทิชชูเล็ก','ทิชชูยาว','ตะเกียบ'] }
+];
+
+const MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+let branch=1, data={};
+
+function storageKey(){
+  const {y,m,d}=getYMD();
+  return `gw_b${branch}_${y}_${m}_${d}`;
+}
+function load(){ try{ const r=localStorage.getItem(storageKey()); return r?JSON.parse(r):{}; }catch{return{};} }
+function save(){ try{ localStorage.setItem(storageKey(),JSON.stringify(data)); }catch{} }
+
+function getYMD(){
+  return {
+    y:parseInt(document.getElementById('yearSel').value||new Date().getFullYear()),
+    m:parseInt(document.getElementById('monthSel').value??new Date().getMonth()),
+    d:parseInt(document.getElementById('daySel').value||new Date().getDate())
+  };
+}
+
+function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+
+function initSelects(){
+  const now=new Date();
+  const ms=document.getElementById('monthSel');
+  MONTHS.forEach((mn,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=mn+(i===now.getMonth()?' (นี้)':''); if(i===now.getMonth())o.selected=true; ms.appendChild(o); });
+  const ys=document.getElementById('yearSel');
+  for(let y=now.getFullYear()-1;y<=now.getFullYear()+1;y++){ const o=document.createElement('option'); o.value=y; o.textContent=y+543; if(y===now.getFullYear())o.selected=true; ys.appendChild(o); }
+  buildDays();
+  ms.addEventListener('change',()=>{buildDays();render();});
+  ys.addEventListener('change',()=>{buildDays();render();});
+  document.getElementById('daySel').addEventListener('change',()=>render());
+}
+
+function buildDays(){
+  const {y,m}=getYMD();
+  const ds=document.getElementById('daySel');
+  const cur=ds.value;
+  ds.innerHTML='';
+  const now=new Date();
+  const cnt=daysInMonth(y,m);
+  for(let d=1;d<=cnt;d++){
+    const o=document.createElement('option');
+    o.value=d;
+    const isToday=(y===now.getFullYear()&&m===now.getMonth()&&d===now.getDate());
+    o.textContent=d+(isToday?' (วันนี้)':'');
+    if((cur&&parseInt(cur)===d)||(!cur&&isToday))o.selected=true;
+    ds.appendChild(o);
+  }
+}
+
+function switchBranch(b,el){
+  branch=b;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('branchNote').style.display=b===2?'flex':'none';
+  render();
+}
+
+function getKey(catId,ii){ return `${catId}_${ii}`; }
+
+function setValue(catId,ii,val){
+  const k=getKey(catId,ii);
+  const v=val.toString().trim();
+  if(v===''||v==='0'){ delete data[k]; } else { data[k]=v; }
+  save();
+  updateStats();
+  updateSummary();
+  const inp=document.getElementById(`inp_${catId}_${ii}`);
+  if(inp){
+    inp.className='qty-input'+(data[k]?(branch===2?' has-value-b2':' has-value'):'');
+  }
+}
+
+function stepQty(catId,ii,delta){
+  const k=getKey(catId,ii);
+  let cur=parseFloat(data[k])||0;
+  cur=Math.max(0,cur+delta);
+  setValue(catId,ii,cur===0?'':cur);
+  const inp=document.getElementById(`inp_${catId}_${ii}`);
+  if(inp) inp.value=cur===0?'':cur;
+}
+
+function render(){
+  data=load();
+  const sec=document.getElementById('sections');
+  sec.innerHTML='';
+  CATS.forEach(cat=>{
+    const div=document.createElement('div');
+    div.className='section';
+    let rows='';
+    cat.items.forEach((item,ii)=>{
+      const k=getKey(cat.id,ii);
+      const val=data[k]||'';
+      const hasCls=val?(branch===2?' has-value-b2':' has-value'):'';
+      rows+=`<div class="item-row">
+        <div class="item-name">${item}</div>
+        <div class="qty-group">
+          <button class="qty-btn" ontouchstart="" onclick="stepQty('${cat.id}',${ii},-1)">−</button>
+          <input class="qty-input${hasCls}" id="inp_${cat.id}_${ii}" type="number" inputmode="decimal" min="0" value="${val}" placeholder="0"
+            onchange="setValue('${cat.id}',${ii},this.value)"
+            oninput="setValue('${cat.id}',${ii},this.value)">
+          <button class="qty-btn" ontouchstart="" onclick="stepQty('${cat.id}',${ii},1)">+</button>
+        </div>
+        <button class="clear-btn" onclick="clearItem('${cat.id}',${ii})" title="ล้าง">×</button>
+      </div>`;
+    });
+    div.innerHTML=`<div class="section-header" onclick="toggleSec(this)">
+      <span class="sec-icon">${cat.icon}</span>
+      <span class="sec-title">${cat.label}</span>
+      <span class="sec-count">${cat.items.length}</span>
+      <span class="sec-arrow open">▼</span>
+    </div><div class="item-list">${rows}</div>`;
+    sec.appendChild(div);
+  });
+  updateStats();
+  updateSummary();
+}
+
+function clearItem(catId,ii){
+  const k=getKey(catId,ii);
+  delete data[k]; save();
+  const inp=document.getElementById(`inp_${catId}_${ii}`);
+  if(inp){inp.value='';inp.className='qty-input';}
+  updateStats(); updateSummary();
+}
+
+function toggleSec(hdr){
+  const body=hdr.nextElementSibling;
+  const arr=hdr.querySelector('.sec-arrow');
+  const isOpen=arr.classList.contains('open');
+  body.style.display=isOpen?'none':'flex';
+  arr.classList.toggle('open',!isOpen);
+}
+
+function updateStats(){
+  let total=0, filled=0;
+  CATS.forEach(cat=>{ cat.items.forEach((_,ii)=>{ total++; if(data[getKey(cat.id,ii)])filled++; }); });
+  document.getElementById('statFilled').textContent=filled;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statPct').textContent=Math.round(filled/total*100)+'%';
+}
+
+function updateSummary(){
+  const sec=document.getElementById('summarySection');
+  let items=[];
+  CATS.forEach(cat=>{ cat.items.forEach((name,ii)=>{ const v=data[getKey(cat.id,ii)]; if(v) items.push({name,val:v}); }); });
+  if(!items.length){ sec.innerHTML=''; return; }
+  const cls=branch===2?'b2':'';
+  let rows=items.map(it=>`<div class="summary-item"><span class="summary-name">${it.name}</span><span class="summary-qty ${cls}">${it.val}</span></div>`).join('');
+  sec.innerHTML=`<div class="summary-section"><div class="summary-header">📋 รายการที่กรอกแล้ว (${items.length} รายการ)</div><div class="summary-list">${rows}</div></div>`;
+}
+
+function copyForLine(){
+  const {y,m,d}=getYMD();
+  const branchName=branch===1?'สาขาห้าแยก':'สาขาธรรมบูชา';
+  const dateStr=`${d} ${MONTHS[m]} ${y+543}`;
+  let items=[];
+  CATS.forEach(cat=>{ cat.items.forEach((name,ii)=>{ const v=data[getKey(cat.id,ii)]; if(v) items.push({cat:cat.label,name,val:v}); }); });
+  if(!items.length){ showToast('ยังไม่ได้กรอกข้อมูล'); return; }
+  let text=`🍜 เช็คของ ${branchName}\n📅 วันที่ ${dateStr}\n`;
+  text+='─'.repeat(25)+'\n';
+  let lastCat='';
+  items.forEach(it=>{
+    if(it.cat!==lastCat){ text+=`\n▸ ${it.cat}\n`; lastCat=it.cat; }
+    text+=`  • ${it.name}: ${it.val}\n`;
+  });
+  text+='─'.repeat(25)+'\n';
+  text+=`รวม ${items.length} รายการ`;
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>showToast('คัดลอกแล้ว วางในไลน์ได้เลย ✓')); }
+  else{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('คัดลอกแล้ว ✓'); }
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+initSelects();
+render();
+</script>
+</body>
+</html>
